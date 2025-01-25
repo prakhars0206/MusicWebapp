@@ -38,7 +38,7 @@ function NavBar({ onSearch, resetToPopular  }) {
     <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
       <Container fluid>
         <Navbar.Brand className="" href="#" onClick={resetToPopular}>
-          Music App
+          Xplore Music
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">

@@ -2,44 +2,8 @@ import fetch from 'node-fetch';
 import express from 'express';
 import {getAuth} from '../accessToken.js';
 const router = express.Router();
-// import { config } from 'dotenv';
 
-// // Load environment variables
-// const clientId = process.env.CLIENT_ID;
-// const clientSecret = process.env.CLIENT_SECRET;
 
-// // Middleware to get Spotify access token
-// let accessToken = '';
-// let tokenExpiry = 0;
-// const getAccessToken = async () => {
-//   const now = Date.now()
-
-//   try{
-//     if (!accessToken || now >= tokenExpiry) {
-//       const authParams = new URLSearchParams();
-//       authParams.append('grant_type', 'client_credentials');
-//       authParams.append('client_id', clientId);
-//       authParams.append('client_secret', clientSecret);
-  
-//       const response = await fetch('https://accounts.spotify.com/api/token', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/x-www-form-urlencoded',
-//         },
-//         body: authParams,
-//       });
-//       const data = await response.json();
-//       accessToken = data.access_token;
-//       tokenExpiry = now + data.expires_in * 1000;
-//     }
-//   }catch(error){
-//     console.error("Error getting token", error);
-//   }
-  
-//   return accessToken;
-// };
-
-// Route: Search for artists and their albums
 router.get('/', async (req, res) => {
   const { query } = req.query; // Query from the frontend
 

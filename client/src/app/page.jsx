@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ShowAlbums from "./searchAlbums";
 import NavBar from "./navbar";
-import RenderPopular from "./popularAlbums";
+import RenderNew from "./newAlbums";
 
 
 export default function Home() {
@@ -33,7 +33,7 @@ export default function Home() {
         {showSearchResults ? (
           <ShowAlbums results={searchResults} />
         ) : (
-          <RenderPopular />
+          <RenderNew />
         )}
         
 
