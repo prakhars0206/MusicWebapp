@@ -5,6 +5,8 @@ import {config } from 'dotenv';
 import {router as searchRouter} from './routes/search.js';
 import {router as tracksRouter} from './routes/songs.js';
 import {router as newRouter} from './routes/new_releases.js';
+import {router as youtubeRouter } from './routes/youtube.js';
+
 
 config()
 
@@ -18,6 +20,7 @@ app.use(bodyParser.json());
 app.use('/api/search', searchRouter);
 app.use('/api/songs', tracksRouter);
 app.use('/api/new_releases', newRouter);
+app.use('/api/youtube', youtubeRouter);
 
 // Server
 const PORT = process.env.PORT || 5001;

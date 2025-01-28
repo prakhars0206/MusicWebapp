@@ -5,14 +5,13 @@ const router = express.Router();
 
 
 router.get('/', async (req, res) => {
-  const { query } = req.query; // Query from the frontend
-
+  const { query } = req.query;
   if (!query) return res.status(400).send({ error: 'Search query is required' });
 
   try {
     const token = await getAuth();
 
-    // Get Artist Info
+    // artist info
     const artistResponse = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=artist`, {
       method: 'GET',
       headers: {
@@ -24,14 +23,14 @@ router.get('/', async (req, res) => {
     const artistData = await artistResponse.json();
     
 
-    // Check if the response contains the artists object
+    // check if response contains the artists object
     if (!artistData || !artistData.artists || !artistData.artists.items || artistData.artists.items.length === 0) {
       return res.status(404).send({ error: 'Artist not found' });
     }
 
     const artist = artistData.artists.items[0];
 
-    // Get Albums by Artist
+    //get albums
     const albumResponse = await fetch(
       `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album&market=US&limit=50`,
       {
