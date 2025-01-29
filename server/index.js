@@ -6,6 +6,7 @@ import {router as searchRouter} from './routes/search.js';
 import {router as tracksRouter} from './routes/songs.js';
 import {router as newRouter} from './routes/new_releases.js';
 import {router as youtubeRouter } from './routes/youtube.js';
+import { router as getAudioRouter } from './routes/getAudio.js';
 
 
 config()
@@ -21,6 +22,8 @@ app.use('/api/search', searchRouter);
 app.use('/api/songs', tracksRouter);
 app.use('/api/new_releases', newRouter);
 app.use('/api/youtube', youtubeRouter);
+app.use('/api/audio', getAudioRouter);
+
 
 // Server
 const PORT = process.env.PORT || 5001;

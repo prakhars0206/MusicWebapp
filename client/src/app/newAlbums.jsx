@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import ShowTracks from "./tracklist";
 
-export default function RenderNew({ onTrackSelect }) {
+export default function RenderNew({ onTrackSelect, setAlbumImg }) {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
@@ -39,7 +39,9 @@ export default function RenderNew({ onTrackSelect }) {
           <ShowTracks
             selectedAlbum={selectedAlbum}
             onBack={() => setSelectedAlbum(null)}
-            onTrackSelect={onTrackSelect} // Notify when a track is selected
+            onTrackSelect={onTrackSelect}
+            setAlbumImg={setAlbumImg}
+            albumImg={selectedAlbum.images?.[0]?.url} // Notify when a track is selected
           />
         ) : (
           <div className="overflow-x-auto">

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 
-export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect }) {
+export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAlbumImg, albumImg }) {
     const [trackList, setTrackList] = useState([]);
     const [loadingTracks, setLoadingTracks] = useState(false);
   
@@ -77,7 +77,10 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect }) {
                   <li
                     key={track.id || index}
                     className="py-3 flex items-center justify-between cursor-pointer"
-                    onClick={() => onTrackSelect(track)}
+                    onClick={() => {
+                      onTrackSelect(track); 
+                      setAlbumImg(albumImg);
+                    }}
                   >
                     <div className="flex items-center">
                       <span className="text-gray-500 mr-4">{index + 1}</span>

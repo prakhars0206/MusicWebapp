@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ShowTracks from "./tracklist";
 
-export default function ShowAlbums({ results, onTrackSelect }) {
+export default function ShowAlbums({ results, onTrackSelect, setAlbumImg }) {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
 
   const artistName = results?.artist || 'Unknown Artist';
@@ -32,6 +32,8 @@ export default function ShowAlbums({ results, onTrackSelect }) {
           selectedAlbum={selectedAlbum}
           onBack={() => setSelectedAlbum(null)}
           onTrackSelect={onTrackSelect}
+          setAlbumImg={setAlbumImg}
+          albumImg={selectedAlbum.images?.[0]?.url}
         />
       ) : results?.albums && results.albums.length > 0 ? (
         <div>
