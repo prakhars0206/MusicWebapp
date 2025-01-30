@@ -66,7 +66,7 @@ function NavBar({ onSearch, resetToPopular  }) {
             {/* Links on the Right */}
             <Nav className="ms-auto">
               <Nav.Link href="#login">Login</Nav.Link>
-              <Nav.Link href="#link">Link</Nav.Link>
+              {/* <Nav.Link href="#link">Link</Nav.Link>
               <NavDropdown title="Link" id="navbarScrollingDropdown">
                 <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action4">Another action</NavDropdown.Item>
@@ -75,7 +75,7 @@ function NavBar({ onSearch, resetToPopular  }) {
               </NavDropdown>
               <Nav.Link href="#" disabled>
                 Disabled
-              </Nav.Link>
+              </Nav.Link> */}
             </Nav>
           </div>
         </Navbar.Collapse>

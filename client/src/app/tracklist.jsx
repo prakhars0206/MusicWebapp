@@ -40,7 +40,7 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
   
     return (
       <div>
-        <button onClick={onBack} className="text-blue-500 underline mb-4">
+        <button onClick={onBack} className="text-blue-500 mb-4">
           Back to Albums
         </button>
         <div className="bg-white border border-gray-200 rounded-xl shadow-md p-6">

@@ -30,7 +30,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
     }
   }, [currentTrack]);
 
-  // Fetch the direct audio URL when video ID changes
+  // Fetch direct audio URL when video ID changes
   useEffect(() => {
     if (videoId) {
       axios
@@ -40,7 +40,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
     }
   }, [videoId]);
 
-  // Handle play/pause functionality
+  // Handle play/pause
   const togglePlayPause = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -85,7 +85,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
           <img
             src={currentAlbumImg}
             alt="Album Cover"
-            className="w-48 h-48 object-cover rounded-md mb-4 shadow-lg"
+            className="w-64 h-64 object-cover rounded-md mb-4 shadow-lg"
           />
 
           {/* Song Details */}

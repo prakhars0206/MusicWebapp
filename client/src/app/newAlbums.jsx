@@ -5,71 +5,102 @@ import ShowTracks from "./tracklist";
 export default function RenderNew({ onTrackSelect, setAlbumImg }) {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [isManual, setIsManual] = useState(false);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
-
-  const fetchNew = async () => {
-    try {
-      const response = await fetch(`http://localhost:5001/api/new_releases`, { method: 'GET' });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error('Failed to fetch new releases');
-      }
-      setAlbums(data.newReleases);
-    } catch (error) {
-      console.error('Error fetching new releases:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   useEffect(() => {
+    const fetchNew = async () => {
+      try {
+        const response = await fetch(`http://localhost:5001/api/new_releases`, { method: 'GET' });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error('Failed to fetch new releases');
+        }
+        setAlbums(data.newReleases);
+      } catch (error) {
+        console.error('Error fetching new releases:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchNew();
   }, []);
 
-  return (
-    <div className="p-6">
-      <div className="rounded-xl p-10 bg-cyan-500">
-        <h2 className="text-3xl font-bold mb-6">New Releases</h2>
+  useEffect(() => {
+    if (albums.length === 0 || isManual) return;
 
-        {loading ? (
-          <div>
-            <img className="justify-center" src="./2ndspinner.svg" alt="Loading spinner" />
-          </div>
-        ) : selectedAlbum ? (
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % albums.length);
+          return 0;
+        }
+        return prev + 1;
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [albums, currentIndex, isManual]);
+
+  if (loading) {
+    return <div className="text-white text-center">Loading...</div>;
+  }
+
+  const album = albums[currentIndex];
+
+  return (
+    <div>
+      <h2 className = "mb-4">New Releases</h2>
+      <div className="relative w-full h-96 flex items-center justify-center bg-black text-white rounded-xl overflow-hidden">
+        <img src={album.images[0].url} alt={album.name} className="absolute w-1/2  object-cover opacity-35" />
+        <div className="relative z-10 text-center p-6">
+          <h2 className="text-4xl font-bold">{album.name}</h2>
+          <p className="text-lg mt-2">{album.artists.map(a => a.name).join(", ")}</p>
+          <button
+            className="mt-4 px-6 py-2 bg-white text-black font-bold rounded-full"
+            onClick={() => {
+              setSelectedAlbum(album);
+              setIsManual(true);
+            }}
+          >
+            View Tracklist
+          </button>
+        </div>
+        <button
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white text-black px-4 py-2 rounded-full"
+          onClick={() => {
+            setCurrentIndex((prevIndex) => (prevIndex - 1 + albums.length) % albums.length);
+            setIsManual(true);
+          }}
+        >
+          ←
+        </button>
+        <button
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white text-black px-4 py-2 rounded-full"
+          onClick={() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % albums.length);
+            setIsManual(true);
+          }}
+        >
+          →
+        </button>
+        <div className="absolute bottom-0 left-0 w-full h-2 bg-gray-700">
+          <div className="h-2 bg-white transition-all" style={{ width: `${progress}%` }}></div>
+        </div>
+      </div>
+      {selectedAlbum && (
+        <div className="mt-6">
           <ShowTracks
             selectedAlbum={selectedAlbum}
             onBack={() => setSelectedAlbum(null)}
             onTrackSelect={onTrackSelect}
             setAlbumImg={setAlbumImg}
-            albumImg={selectedAlbum.images?.[0]?.url} // Notify when a track is selected
+            albumImg={selectedAlbum.images?.[0]?.url}
           />
-        ) : (
-          <div className="overflow-x-auto">
-            <div className="flex gap-6">
-              {albums.map((album) => (
-                <div
-                  key={album.id}
-                  className="flex-shrink-0 flex flex-col items-center bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl"
-                  style={{ width: '250px' }}
-                  onClick={() => setSelectedAlbum(album)}
-                >
-                  <img
-                    src={album.images?.[0]?.url}
-                    alt={`${album.name} Cover`}
-                    className="w-60 h-60 object-cover rounded-md mb-4"
-                  />
-                  <div className="text-center">
-                    <strong className="text-2xl">{album.name}</strong>
-                    <p className="text-gray-600 mt-2">{album.artists.map((artist) => artist.name).join(', ')}</p>
-                    <p className="text-sm text-gray-500 mt-2">Release Date: {album.release_date}</p>
-                    <p className="text-sm text-gray-500">Total Tracks: {album.total_tracks}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

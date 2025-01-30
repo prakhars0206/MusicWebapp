@@ -37,7 +37,7 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Section: Search Results or New Releases */}
-        <div className="w-2/3 overflow-y-auto bg-sky-200 p-4">
+        <div className="w-2/3 overflow-y-auto bg-gradient-to-r from-gray-600 to-teal-500 p-4">
           {showSearchResults ? (
             <ShowAlbums results={searchResults} onTrackSelect={handleTrackSelection} setAlbumImg={setCurrentAlbumimg}/>
           ) : (
@@ -46,7 +46,7 @@ export default function Home() {
         </div>
 
         {/* Right Section: Music Player */}
-        <div className="w-1/3 bg-white border-l border-gray-300 p-4">
+        <div className="w-1/3 bg-teal-600 p-4">
           <MusicPlayer currentTrack={currentTrack} currentAlbumImg={currentAlbumImg} />
         </div>
       </div>
