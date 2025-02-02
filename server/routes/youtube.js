@@ -11,6 +11,8 @@ const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 router.get('/search', async (req, res) => {
   const { query } = req.query;
 
+  console.log(query);
+
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
   }
@@ -25,6 +27,8 @@ router.get('/search', async (req, res) => {
         maxResults: 1
       }
     });
+
+    console.log(response)
 
     const video = response.data.items[0];
     if (!video) {

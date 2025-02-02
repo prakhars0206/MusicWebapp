@@ -78,7 +78,7 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
                     key={track.id || index}
                     className="py-3 flex items-center justify-between cursor-pointer"
                     onClick={() => {
-                      onTrackSelect(track); 
+                      onTrackSelect(track, trackList); 
                       setAlbumImg(albumImg);
                     }}
                   >

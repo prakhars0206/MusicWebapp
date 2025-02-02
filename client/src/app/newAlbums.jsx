@@ -37,7 +37,7 @@ export default function RenderNew({ onTrackSelect, setAlbumImg }) {
           setCurrentIndex((prevIndex) => (prevIndex + 1) % albums.length);
           return 0;
         }
-        return prev + 1;
+        return prev + 2;
       });
     }, 100);
 
@@ -53,7 +53,16 @@ export default function RenderNew({ onTrackSelect, setAlbumImg }) {
   return (
     <div>
       <h2 className = "mb-4">New Releases</h2>
-      <div className="relative w-full h-96 flex items-center justify-center bg-black text-white rounded-xl overflow-hidden">
+      <div className="relative w-full h-96 flex items-center justify-center bg-black text-white rounded-xl overflow-hidden"
+        onMouseOver={() => {
+
+          setIsManual(true);
+
+        }}
+        onMouseOut={() =>{
+          setIsManual(false);
+        }}
+      >
         <img src={album.images[0].url} alt={album.name} className="absolute w-1/2  object-cover opacity-35" />
         <div className="relative z-10 text-center p-6">
           <h2 className="text-4xl font-bold">{album.name}</h2>
@@ -62,17 +71,17 @@ export default function RenderNew({ onTrackSelect, setAlbumImg }) {
             className="mt-4 px-6 py-2 bg-white text-black font-bold rounded-full"
             onClick={() => {
               setSelectedAlbum(album);
-              setIsManual(true);
+              
             }}
           >
-            View Tracklist
+            Listen Now
           </button>
         </div>
         <button
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white text-black px-4 py-2 rounded-full"
           onClick={() => {
             setCurrentIndex((prevIndex) => (prevIndex - 1 + albums.length) % albums.length);
-            setIsManual(true);
+            
           }}
         >
           ←
@@ -81,7 +90,7 @@ export default function RenderNew({ onTrackSelect, setAlbumImg }) {
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white text-black px-4 py-2 rounded-full"
           onClick={() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % albums.length);
-            setIsManual(true);
+
           }}
         >
           →

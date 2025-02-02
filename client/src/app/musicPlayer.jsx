@@ -1,24 +1,26 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaPlay, FaPause } from 'react-icons/fa';
+import { FaPlay, FaPause, FaRedo, FaStepBackward, FaStepForward } from 'react-icons/fa';
 
-export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
+export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, onTrackChange }) {
   const [videoId, setVideoId] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [repeat, setRepeat] = useState(false);
   const audioRef = useRef(null);
+
+  
 
   const containerStyle = {
     backgroundImage: `url(${currentAlbumImg})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundBlendMode: 'darken',
-    backgroundColor: 'rgba(0,0,0,0.7)', // Dark overlay
+    backgroundColor: 'rgba(0,0,0,0.7)',
   };
 
-  // Fetch YouTube video ID when track changes
   useEffect(() => {
     if (currentTrack) {
       axios
@@ -30,7 +32,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
     }
   }, [currentTrack]);
 
-  // Fetch direct audio URL when video ID changes
   useEffect(() => {
     if (videoId) {
       axios
@@ -40,7 +41,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
     }
   }, [videoId]);
 
-  // Handle play/pause
   const togglePlayPause = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -51,26 +51,55 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
     setIsPlaying(!isPlaying);
   };
 
-  // Update progress bar as audio plays
   useEffect(() => {
     if (audioRef.current) {
       const updateProgress = () => {
         setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
       };
 
+      const handleEnd = () => {
+        if (repeat) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play();
+        } else {
+          handleNext();
+        }
+      };
+
       audioRef.current.addEventListener('timeupdate', updateProgress);
+      audioRef.current.addEventListener('ended', handleEnd);
       return () => {
         audioRef.current.removeEventListener('timeupdate', updateProgress);
+        audioRef.current.removeEventListener('ended', handleEnd);
       };
     }
-  }, [audioUrl]);
+  }, [audioUrl, repeat]);
 
-  // Seek audio
   const handleSeek = (e) => {
     if (audioRef.current) {
       const seekTime = (e.target.value / 100) * audioRef.current.duration;
       audioRef.current.currentTime = seekTime;
       setProgress(e.target.value);
+    }
+  };
+
+  const handleRepeat = () => {
+    setRepeat(!repeat);
+  };
+
+  const handleNext = () => {
+    if (!trackList || trackList.length === 0) return;
+    const currentIndex = trackList.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex < trackList.length - 1) {
+      onTrackChange(trackList[currentIndex + 1]);
+    }
+  };
+
+  const handlePrev = () => {
+    if (!trackList || trackList.length === 0) return;
+    const currentIndex = trackList.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex > 0) {
+      onTrackChange(trackList[currentIndex - 1]);
     }
   };
 
@@ -81,36 +110,41 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg }) {
     >
       {currentTrack ? (
         <>
-          {/* Album Cover */}
           <img
             src={currentAlbumImg}
             alt="Album Cover"
             className="w-64 h-64 object-cover rounded-md mb-4 shadow-lg"
           />
 
-          {/* Song Details */}
           <h2 className="text-xl font-semibold text-white">{currentTrack.name}</h2>
           <p className="text-gray-300">{currentTrack.artists?.map((artist) => artist.name).join(', ')}</p>
 
-          {/* Audio Player */}
           {audioUrl ? (
             <>
               <audio ref={audioRef} src={audioUrl} preload="auto" />
-
-              {/* Playback Controls */}
+              <input
+                type="range"
+                className="w-80 mt-16"
+                min="0"
+                max="100"
+                value={progress}
+                onChange={handleSeek}
+              />
               <div className="flex items-center gap-6 mt-4">
+                <button onClick={handlePrev} className="bg-white text-black p-3 rounded-full shadow-md">
+                  <FaStepBackward size={20} />
+                </button>
                 <button onClick={togglePlayPause} className="bg-white text-black p-3 rounded-full shadow-md">
                   {isPlaying ? <FaPause size={20} /> : <FaPlay size={20} />}
                 </button>
-                <input
-                  type="range"
-                  className="w-48"
-                  min="0"
-                  max="100"
-                  value={progress}
-                  onChange={handleSeek}
-                />
+                <button onClick={handleNext} className="bg-white text-black p-3 rounded-full shadow-md">
+                  <FaStepForward size={20} />
+                </button>
+                <button onClick={handleRepeat} className={`p-3 rounded-full shadow-md ${repeat ? 'bg-green-500' : 'bg-white text-black'}`}>
+                  <FaRedo size={20} />
+                </button>
               </div>
+              
             </>
           ) : (
             <p className="text-gray-400">Loading audio...</p>

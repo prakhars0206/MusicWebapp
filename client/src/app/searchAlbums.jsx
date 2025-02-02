@@ -5,8 +5,10 @@ import ShowTracks from "./tracklist";
 export default function ShowAlbums({ results, onTrackSelect, setAlbumImg }) {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
 
+
   const artistName = results?.artist || 'Unknown Artist';
   const artistImage = results?.artist_img?.[0]?.url || null;
+
 
   return (
     <div className="p-6">
@@ -28,6 +30,8 @@ export default function ShowAlbums({ results, onTrackSelect, setAlbumImg }) {
 
       {/* Albums Section */}
       {selectedAlbum ? (
+
+        
         <ShowTracks
           selectedAlbum={selectedAlbum}
           onBack={() => setSelectedAlbum(null)}
