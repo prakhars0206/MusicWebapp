@@ -52,7 +52,7 @@ export default function RenderNew({ onTrackSelect, setAlbumImg }) {
 
   return (
     <div>
-      <h2 className = "mb-4">New Releases</h2>
+      <h2 className = "mb-4 text-cyan-100">New Releases</h2>
       <div className="relative w-full h-96 flex items-center justify-center bg-black text-white rounded-xl overflow-hidden"
         onMouseOver={() => {
 

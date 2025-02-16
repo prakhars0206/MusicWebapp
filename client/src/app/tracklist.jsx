@@ -43,7 +43,7 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
         <button onClick={onBack} className="text-blue-500 mb-4">
           Back to Albums
         </button>
-        <div className="bg-white border border-gray-200 rounded-xl shadow-md p-6">
+        <div className="bg-cyan-950  rounded-xl shadow-md p-6">
           <div className="flex">
             <img
               src={selectedAlbum.images?.[0]?.url || '/placeholder-image.png'}
@@ -51,15 +51,15 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
               className="w-64 h-64 object-cover rounded-md mr-6"
             />
             <div>
-              <h3 className="text-3xl font-bold mb-4">{selectedAlbum.name || 'Unknown Album'}</h3>
-              <p className="text-gray-600">
+              <h3 className="text-3xl font-bold mb-4 text-cyan-100">{selectedAlbum.name || 'Unknown Album'}</h3>
+              <p className="text-gray-600 text-cyan-200">
                 {selectedAlbum.artists?.map((artist) => artist.name).join(', ') ||
                   'Unknown Artists'}
               </p>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-cyan-300 mt-2">
                 Release Date: {selectedAlbum.release_date || 'Unknown'}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-cyan-300">
                 Total Tracks: {selectedAlbum.total_tracks || 'N/A'}
               </p>
             </div>
@@ -71,7 +71,7 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
             </div>
           ) : trackList.length > 0 ? (
             <div className="mt-6">
-              <h4 className="text-xl font-semibold mb-2">Tracklist:</h4>
+              <h4 className="text-xl text-cyan-100 font-semibold mb-2">Tracklist:</h4>
               <ul className="divide-y divide-gray-200">
                 {trackList.map((track, index) => (
                   <li
@@ -83,10 +83,10 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
                     }}
                   >
                     <div className="flex items-center">
-                      <span className="text-gray-500 mr-4">{index + 1}</span>
-                      <p className="font-medium">{track.name}</p>
+                      <span className="text-cyan-300 mr-4">{index + 1}</span>
+                      <p className="text-cyan-100 font-medium pt-3">{track.name}</p>
                     </div>
-                    <span className="text-gray-500">{formatDuration(track.duration_ms)}</span>
+                    <span className="text-cyan-300">{formatDuration(track.duration_ms)}</span>
                   </li>
                 ))}
               </ul>

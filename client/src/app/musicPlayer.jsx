@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaPlay, FaPause, FaRedo, FaStepBackward, FaStepForward } from 'react-icons/fa';
 
-export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, onTrackChange }) {
+export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack, onPrevTrack }) {
   const [videoId, setVideoId] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -11,7 +11,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, 
   const [repeat, setRepeat] = useState(false);
   const audioRef = useRef(null);
 
-  
 
   const containerStyle = {
     backgroundImage: `url(${currentAlbumImg})`,
@@ -42,7 +41,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, 
   }, [videoId]);
 
   const togglePlayPause = () => {
-    if (!audioRef.current) return;
+    
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -53,6 +52,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, 
 
   useEffect(() => {
     if (audioRef.current) {
+
       const updateProgress = () => {
         setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
       };
@@ -62,12 +62,15 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, 
           audioRef.current.currentTime = 0;
           audioRef.current.play();
         } else {
-          handleNext();
+            onNextTrack();
         }
       };
 
       audioRef.current.addEventListener('timeupdate', updateProgress);
       audioRef.current.addEventListener('ended', handleEnd);
+      
+      audioRef.current.play();
+      setIsPlaying(true);
       return () => {
         audioRef.current.removeEventListener('timeupdate', updateProgress);
         audioRef.current.removeEventListener('ended', handleEnd);
@@ -87,21 +90,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, 
     setRepeat(!repeat);
   };
 
-  const handleNext = () => {
-    if (!trackList || trackList.length === 0) return;
-    const currentIndex = trackList.findIndex(track => track.id === currentTrack.id);
-    if (currentIndex < trackList.length - 1) {
-      onTrackChange(trackList[currentIndex + 1]);
-    }
-  };
-
-  const handlePrev = () => {
-    if (!trackList || trackList.length === 0) return;
-    const currentIndex = trackList.findIndex(track => track.id === currentTrack.id);
-    if (currentIndex > 0) {
-      onTrackChange(trackList[currentIndex - 1]);
-    }
-  };
 
   return (
     <div 
@@ -131,13 +119,13 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, trackList, 
                 onChange={handleSeek}
               />
               <div className="flex items-center gap-6 mt-4">
-                <button onClick={handlePrev} className="bg-white text-black p-3 rounded-full shadow-md">
+                <button onClick={onPrevTrack} className="bg-white text-black p-3 rounded-full shadow-md">
                   <FaStepBackward size={20} />
                 </button>
                 <button onClick={togglePlayPause} className="bg-white text-black p-3 rounded-full shadow-md">
                   {isPlaying ? <FaPause size={20} /> : <FaPlay size={20} />}
                 </button>
-                <button onClick={handleNext} className="bg-white text-black p-3 rounded-full shadow-md">
+                <button onClick={onNextTrack} className="bg-white text-black p-3 rounded-full shadow-md">
                   <FaStepForward size={20} />
                 </button>
                 <button onClick={handleRepeat} className={`p-3 rounded-full shadow-md ${repeat ? 'bg-green-500' : 'bg-white text-black'}`}>

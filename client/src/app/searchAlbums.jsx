@@ -14,16 +14,16 @@ export default function ShowAlbums({ results, onTrackSelect, setAlbumImg }) {
     <div className="p-6">
       {/* Artist Header */}
       {artistImage ? (
-        <div className="flex items-center mb-10 bg-cyan-500 rounded-xl p-8">
+        <div className="flex items-center mb-6 bg-cyan-900 rounded-xl p-8">
           <img
             src={artistImage}
             alt={`${artistName} Image`}
             className="w-36 h-36 sm:w-48 sm:h-48 rounded-full object-cover"
           />
-          <h2 className="text-5xl sm:text-7xl font-bold ml-8">{artistName}</h2>
+          <h2 className="text-5xl sm:text-7xl text-cyan-100 font-bold ml-8">{artistName}</h2>
         </div>
       ) : (
-        <div className="flex items-center mb-10 bg-cyan-500 rounded-xl p-6">
+        <div className="flex items-center mb-10 bg-cyan-900 rounded-xl p-6">
           <h2 className="text-5xl sm:text-7xl font-bold">{artistName}</h2>
         </div>
       )}
@@ -41,12 +41,12 @@ export default function ShowAlbums({ results, onTrackSelect, setAlbumImg }) {
         />
       ) : results?.albums && results.albums.length > 0 ? (
         <div>
-          <h2 className="text-3xl font-semibold mb-6">Albums:</h2>
+          <h2 className="text-3xl text-cyan-100 font-semibold mb-6">Albums:</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {results.albums.map((album) => (
               <div
                 key={album.id}
-                className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer"
+                className="flex flex-col items-center bg-cyan-950 rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer"
                 onClick={() => setSelectedAlbum(album)}
               >
                 {/* Square Album Image */}
@@ -59,16 +59,16 @@ export default function ShowAlbums({ results, onTrackSelect, setAlbumImg }) {
                 </div>
                 {/* Album Info */}
                 <div className="text-center">
-                  <strong className="text-lg sm:text-lg block w-full">
+                  <strong className="text-lg text-cyan-100 sm:text-lg block w-full">
                     {album.name}
                   </strong>
-                  <p className="text-sm text-gray-600 mt-1 block w-full">
+                  <p className="text-sm text-cyan-200 mt-1 block w-full">
                     {album.artists.map((artist) => artist.name).join(', ')}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-cyan-300 mt-1">
                     Release Date: {album.release_date}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-cyan-300">
                     Total Tracks: {album.total_tracks}
                   </p>
                 </div>

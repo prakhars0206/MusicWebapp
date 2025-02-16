@@ -28,8 +28,6 @@ router.get('/search', async (req, res) => {
       }
     });
 
-    console.log(response)
-
     const video = response.data.items[0];
     if (!video) {
       return res.status(404).json({ error: 'No video found' });
