@@ -1,5 +1,5 @@
 # MusicWebapp
-Attempt at creating a fully functional music website 
+Attempt at creating a fully functional Music streaming webapp 
 Frontend in react, javascript, tailwind css
 Backend in node.js, express.js
 
