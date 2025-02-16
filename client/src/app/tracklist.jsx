@@ -52,7 +52,7 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
             />
             <div>
               <h3 className="text-3xl font-bold mb-4 text-cyan-100">{selectedAlbum.name || 'Unknown Album'}</h3>
-              <p className="text-gray-600 text-cyan-200">
+              <p className=" text-cyan-200">
                 {selectedAlbum.artists?.map((artist) => artist.name).join(', ') ||
                   'Unknown Artists'}
               </p>
