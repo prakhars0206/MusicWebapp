@@ -1,41 +1,33 @@
 import express from 'express';
-import axios from 'axios';
-import { config } from 'dotenv';
+import { Innertube } from 'youtubei.js';
 
-config();
 const router = express.Router();
-
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 
 router.get('/search', async (req, res) => {
   const { query } = req.query;
-
-  console.log(query);
-
+  
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
   }
 
   try {
-    const response = await axios.get(YOUTUBE_SEARCH_URL, {
-      params: {
-        part: 'snippet',
-        q: `${query} audio`,
-        type: 'video',
-        key: YOUTUBE_API_KEY,
-        maxResults: 1
-      }
-    });
-
-    const video = response.data.items[0];
-    if (!video) {
+    // Create an instance of Innertube (YouTube's internal API client)
+    const yt = await Innertube.create();
+    // Search for videos using the query; limit results to 1
+    console.log(query);
+    const searchResults = await yt.search(`${query} audio`, { type: "video" });
+    
+    if (!searchResults.results || searchResults.results.length === 0) {
       return res.status(404).json({ error: 'No video found' });
     }
-
-    res.json({ videoId: video.id.videoId });
+    
+    // The video ID can be found in the id property (check the library's docs for the exact structure)
+    const videoId = searchResults.results[0].id;
+    
+    console.log('Found videoId:', videoId);
+    res.json({ videoId });
   } catch (error) {
-    console.error('Error fetching YouTube video:', error);
+    console.error('Error fetching YouTube video via Innertube:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

@@ -3,14 +3,13 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaPlay, FaPause, FaRedo, FaStepBackward, FaStepForward } from 'react-icons/fa';
 
-export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack, onPrevTrack }) {
-  const [videoId, setVideoId] = useState(null);
+export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack, onPrevTrack, trackList, currentTrackIndex }) {
   const [audioUrl, setAudioUrl] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [repeat, setRepeat] = useState(false);
+  const [audioCache, setAudioCache] = useState({});
   const audioRef = useRef(null);
-
 
   const containerStyle = {
     backgroundImage: `url(${currentAlbumImg})`,
@@ -20,28 +19,111 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
     backgroundColor: 'rgba(0,0,0,0.7)',
   };
 
+  //Fetch audio for current track using caching
   useEffect(() => {
-    if (currentTrack) {
-      axios
-        .get(`http://localhost:5001/api/youtube/search`, {
+    if (!currentTrack) return;
+
+    const fetchAudio = async () => {
+      //Check cache first
+      if (audioCache[currentTrack.id]) {
+        setAudioUrl(audioCache[currentTrack.id]);
+        return;
+      }
+
+      try {
+        const videoRes = await axios.get(`http://localhost:5001/api/youtube/search`, {
           params: { query: `${currentTrack.name} ${currentTrack.artists.map(a => a.name).join(' ')}` }
-        })
-        .then((res) => setVideoId(res.data.videoId))
-        .catch((err) => console.error('Error fetching YouTube video ID:', err.response || err));
-    }
+        });
+        
+        const audioRes = await axios.get(`http://localhost:5001/api/audio/audio`, { 
+          params: { videoId: videoRes.data.videoId } 
+        });
+
+        // Update cache
+        setAudioCache(prev => ({
+          ...prev,
+          [currentTrack.id]: audioRes.data.audioUrl
+        }));
+        setAudioUrl(audioRes.data.audioUrl);
+      } catch (err) {
+        console.error('Error fetching audio:', err);
+      }
+    };
+
+    fetchAudio();
   }, [currentTrack]);
 
+  // preload the next track
   useEffect(() => {
-    if (videoId) {
-      axios
-        .get(`http://localhost:5001/api/audio/audio`, { params: { videoId } })
-        .then((res) => setAudioUrl(res.data.audioUrl))
-        .catch((err) => console.error('Error fetching YouTube audio:', err.response || err));
-    }
-  }, [videoId]);
+    if (!trackList?.length || currentTrackIndex === null) return;
+
+    const nextIndex = (currentTrackIndex + 1) % trackList.length;
+    const nextTrack = trackList[nextIndex];
+    if (!nextTrack || audioCache[nextTrack.id]) return;
+
+    const preloadNext = async () => {
+      try {
+        const videoRes = await axios.get(`http://localhost:5001/api/youtube/search`, {
+          params: { query: `${nextTrack.name} ${nextTrack.artists.map(a => a.name).join(' ')}` }
+        });
+
+        const audioRes = await axios.get(`http://localhost:5001/api/audio/audio`, { 
+          params: { videoId: videoRes.data.videoId } 
+        });
+
+        setAudioCache(prev => ({
+          ...prev,
+          [nextTrack.id]: audioRes.data.audioUrl
+        }));
+      } catch (err) {
+        console.error('Error preloading next track:', err);
+      }
+    };
+
+    preloadNext();
+  }, [currentTrackIndex, trackList]);
+
+  //Handling audio playback
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (!audioElement || !audioUrl) return;
+
+    const updateProgress = () => {
+      setProgress((audioElement.currentTime / audioElement.duration) * 100);
+    };
+
+    const handleEnd = () => {
+      if (repeat) {
+        audioElement.currentTime = 0;
+        audioElement.play();
+      } else {
+        onNextTrack();
+      }
+    };
+
+    audioElement.addEventListener('timeupdate', updateProgress);
+    audioElement.addEventListener('ended', handleEnd);
+
+    // Auto-play when audio loads
+    const playAudio = async () => {
+      try {
+        await audioElement.play();
+        setIsPlaying(true);
+      } catch (err) {
+        console.error('Playback error:', err);
+      }
+    };
+
+    playAudio();
+
+    return () => {
+      audioElement.pause();
+      audioElement.removeEventListener('timeupdate', updateProgress);
+      audioElement.removeEventListener('ended', handleEnd);
+    };
+  }, [audioUrl, repeat]);
 
   const togglePlayPause = () => {
-    
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -49,34 +131,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
     }
     setIsPlaying(!isPlaying);
   };
-
-  useEffect(() => {
-    if (audioRef.current) {
-
-      const updateProgress = () => {
-        setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
-      };
-
-      const handleEnd = () => {
-        if (repeat) {
-          audioRef.current.currentTime = 0;
-          audioRef.current.play();
-        } else {
-            onNextTrack();
-        }
-      };
-
-      audioRef.current.addEventListener('timeupdate', updateProgress);
-      audioRef.current.addEventListener('ended', handleEnd);
-      
-      audioRef.current.play();
-      setIsPlaying(true);
-      return () => {
-        audioRef.current.removeEventListener('timeupdate', updateProgress);
-        audioRef.current.removeEventListener('ended', handleEnd);
-      };
-    }
-  }, [audioUrl, repeat]);
 
   const handleSeek = (e) => {
     if (audioRef.current) {
@@ -89,7 +143,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
   const handleRepeat = () => {
     setRepeat(!repeat);
   };
-
 
   return (
     <div 
@@ -109,7 +162,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
 
           {audioUrl ? (
             <>
-              <audio ref={audioRef} src={audioUrl} preload="auto" />
+              <audio ref={audioRef} src={audioUrl} />
               <input
                 type="range"
                 className="w-80 mt-16"
@@ -132,7 +185,6 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
                   <FaRedo size={20} />
                 </button>
               </div>
-              
             </>
           ) : (
             <p className="text-gray-400">Loading audio...</p>

@@ -57,7 +57,13 @@ export default function Home() {
       <div className="flex flex-1 overflow-hidden">
         <div className="w-2/3 overflow-y-auto bg-gradient-to-r from-gray-600 to-teal-500 p-4">
           {showSearchResults ? (
-            <ShowAlbums results={searchResults} onTrackSelect={handleTrackSelection} setAlbumImg={setCurrentAlbumimg} selectedAlbum={selectedAlbum} setSelectedAlbum={setSelectedAlbum}/>
+            <ShowAlbums 
+            results={searchResults} 
+            onTrackSelect={handleTrackSelection} 
+            setAlbumImg={setCurrentAlbumimg} 
+            selectedAlbum={selectedAlbum} 
+            setSelectedAlbum={setSelectedAlbum}
+            />
           ) : (
             <RenderNew onTrackSelect={handleTrackSelection} setAlbumImg={setCurrentAlbumimg} />
           )}
@@ -68,6 +74,8 @@ export default function Home() {
             currentAlbumImg={currentAlbumImg} 
             onNextTrack={handleNextTrack} 
             onPrevTrack={handlePrevTrack} 
+            trackList={trackList}
+            currentTrackIndex={currentTrackIndex} 
           />
         </div>
       </div>
