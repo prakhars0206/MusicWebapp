@@ -25,15 +25,19 @@ router.get('/search', async (req, res) => {
     if (songs && songs.length > 0) {
       // Normalize query for matching
       const lowerQuery = query.toLowerCase();
-      //Check the first 5 results for a match in the title
-      for (let i = 0; i < Math.min(5, songs.length); i++) {
-        // The structure may vary; adjust property names as needed
+
+      const songTitle = songs[0].title || '';
+      console.log(`${songTitle.toLowerCase()}: ${(lowerQuery.includes(songTitle.toLowerCase()))}`);
+      if (lowerQuery.includes(songTitle.toLowerCase())) {
+        selectedSong = songs[0];
+      }
+
+      // just for testing purposes to see other results
+      for (let i = 1; i < Math.min(5, songs.length); i++) {
+
         const songTitle = songs[i].title || '';
-        console.log(songTitle.toLowerCase());
-        if (lowerQuery.includes(songTitle.toLowerCase())) {
-          selectedSong = songs[i];
-          break;
-        }
+        console.log(`${songTitle.toLowerCase()}: ${(lowerQuery.includes(songTitle.toLowerCase()))}`);
+        
       }
     }
 
@@ -51,7 +55,7 @@ router.get('/search', async (req, res) => {
     }
 
     // Otherwise, fall back to a normal YouTube search for audio
-    const searchResults = await yt.search(`${query} song`, { type: "video" });
+    const searchResults = await yt.search(`${query} audio`, { type: "video" });
     if (!searchResults.results || searchResults.results.length === 0) {
       return res.status(404).json({ error: 'No video found' });
     }
