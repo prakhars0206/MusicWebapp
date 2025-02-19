@@ -36,7 +36,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
         });
         
         const audioRes = await axios.get(`http://localhost:5001/api/audio/audio`, { 
-          params: { videoId: videoRes.data.videoId } 
+          params: { videoId: videoRes.data.songId } 
         });
 
         // Update cache
@@ -68,7 +68,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
         });
 
         const audioRes = await axios.get(`http://localhost:5001/api/audio/audio`, { 
-          params: { videoId: videoRes.data.videoId } 
+          params: { videoId: videoRes.data.songId } 
         });
 
         setAudioCache(prev => ({
@@ -113,6 +113,8 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
         console.error('Playback error:', err);
       }
     };
+
+    console.log(audioCache);
 
     playAudio();
 
