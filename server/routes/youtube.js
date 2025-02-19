@@ -18,53 +18,61 @@ router.get('/search', async (req, res) => {
     const ytmusicresults = await ytMusicController.search(`${query}`, { type: "song" });
 
     console.log(query);
-    //console.log(ytmusicresults.songs)
+    console.log("///////");
 
-    if (!ytmusicresults.songs || ytmusicresults.songs.length === 0) {
-      return res.status(404).json({ error: 'No song found' });
+    const songs = ytmusicresults.songs?.contents;
+    let selectedSong = null;
+    if (songs && songs.length > 0) {
+      // Normalize query for matching
+      const lowerQuery = query.toLowerCase();
+      //Check the first 5 results for a match in the title
+      for (let i = 0; i < Math.min(5, songs.length); i++) {
+        // The structure may vary; adjust property names as needed
+        const songTitle = songs[i].title || '';
+        console.log(songTitle.toLowerCase());
+        if (lowerQuery.includes(songTitle.toLowerCase())) {
+          selectedSong = songs[i];
+          break;
+        }
+      }
     }
 
-    const song = ytmusicresults.songs.contents;
-    const songId = song[0]?.id;
-    console.log(song[0]);
-    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    console.log(song[1]);
-    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    console.log(song[2]);
+    // If we found a matching song in YouTube Music results, use its id.
+    if (selectedSong && selectedSong.id) {
+      console.log('Found song via YouTube Music:', selectedSong.id);
+      console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+      console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+      console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+      console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+      console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+      console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+
+      return res.json({ songId: selectedSong.id });
+    }
+
+    // Otherwise, fall back to a normal YouTube search for audio
+    const searchResults = await yt.search(`${query} song`, { type: "video" });
+    if (!searchResults.results || searchResults.results.length === 0) {
+      return res.status(404).json({ error: 'No video found' });
+    }
+    // Find the first result of type 'Video'
+    const vid = searchResults.results.find(result => result.type === 'Video');
+    const videoId = vid?.id;
+    if (!videoId) {
+      console.log(searchResults);
+      return res.status(404).json({ error: 'No video found' });
+    }
+    console.log('Fallback videoId:', videoId);
+    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+
+    res.json({ songId: videoId });
    
 
-    
-    // const searchResults = await yt.search(`${query} audio`, { type: "video" });
-    
-    // if (!searchResults.results || searchResults.results.length === 0) {
-    //   return res.status(404).json({ error: 'No video found' });
-    // }
-    
-
-    // //find first instance of type video otherwise shit breaks sometimes
-    // const vid = searchResults.results.find(result => result.type === 'Video');
-    // const videoId = vid?.id;
-
-    
-    if (!songId) {
-      console.log(ytmusicresults);
-      return res.status(404).json({ error: 'No song found' });
-      
-    }
-    
-    console.log('Found songId:', songId);
-
-    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
-    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
-    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
-    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
-    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
-    console.log("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
-    res.json({ songId });
   } catch (error) {
     console.error('Error fetching YouTube Music song via Innertube:', error);
     res.status(500).json({ error: 'Internal Server Error' });
