@@ -8,7 +8,7 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [repeat, setRepeat] = useState(false);
-  const [audioCache, setAudioCache] = useState({});
+  const [audioCache, setAudioCache] = useState(new Map());
   const audioRef = useRef(null);
 
   const containerStyle = {
@@ -25,8 +25,16 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
 
     const fetchAudio = async () => {
       //Check cache first
-      if (audioCache[currentTrack.id]) {
-        setAudioUrl(audioCache[currentTrack.id]);
+      if (audioCache.has(currentTrack.id)) {
+        // Update cache order
+        const url = audioCache.get(currentTrack.id);
+        setAudioCache(prev => {
+          const newCache = new Map(prev);
+          newCache.delete(currentTrack.id); // Remove from current position
+          newCache.set(currentTrack.id, url); // Add to end (most recent)
+          return newCache;
+        });
+        setAudioUrl(url);
         return;
       }
 
@@ -34,18 +42,26 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
         const videoRes = await axios.get(`http://localhost:5001/api/youtube/search`, {
           params: { query: `${currentTrack.name} ${currentTrack.artists.map(a => a.name).join(' ')} ${currentTrack.explicit||false}` }
         });
-        console.log(currentTrack);
+        
         
         const audioRes = await axios.get(`http://localhost:5001/api/audio/audio`, { 
           params: { videoId: videoRes.data.songId } 
         });
 
-        // Update cache
-        setAudioCache(prev => ({
-          ...prev,
-          [currentTrack.id]: audioRes.data.audioUrl
-        }));
+        // Update cache with new entry
+        setAudioCache(prev => {
+          const newCache = new Map(prev);
+          newCache.set(currentTrack.id, audioRes.data.audioUrl);
+          
+          // Remove oldest entry if cache exceeds 15
+          if (newCache.size > 15) {
+            const firstKey = newCache.keys().next().value;
+            newCache.delete(firstKey);
+          }
+          return newCache;
+        });
         setAudioUrl(audioRes.data.audioUrl);
+        console.log(audioCache);
       } catch (err) {
         console.error('Error fetching audio:', err);
       }
@@ -72,10 +88,18 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
           params: { videoId: videoRes.data.songId } 
         });
 
-        setAudioCache(prev => ({
-          ...prev,
-          [nextTrack.id]: audioRes.data.audioUrl
-        }));
+        // Add to cache with LRU management
+        setAudioCache(prev => {
+          const newCache = new Map(prev);
+          newCache.set(nextTrack.id, audioRes.data.audioUrl);
+          
+          if (newCache.size > 15) {
+            const firstKey = newCache.keys().next().value;
+            newCache.delete(firstKey);
+          }
+          return newCache;
+        });
+        console.log(audioCache);
       } catch (err) {
         console.error('Error preloading next track:', err);
       }
