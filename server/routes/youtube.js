@@ -4,13 +4,18 @@ import { Innertube } from 'youtubei.js';
 const router = express.Router();
 
 router.get('/search', async (req, res) => {
-  const { query } = req.query;
+  let { query } = req.query;
   
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
   }
 
   try {
+    const explicit = query.slice(-5).trim();
+    
+    console.log(explicit);
+    query = query.slice(0,-5).trim();
+    
 
     const yt = await Innertube.create();
     const ytMusicController = yt.music;
@@ -18,7 +23,7 @@ router.get('/search', async (req, res) => {
     const ytmusicresults = await ytMusicController.search(`${query}`, { type: "song" });
 
     console.log(query);
-    console.log("///////");
+    console.log("--------");
 
     const songs = ytmusicresults.songs?.contents;
     let selectedSong = null;
@@ -29,7 +34,21 @@ router.get('/search', async (req, res) => {
       const songTitle = songs[0].title || '';
       console.log(`${songTitle.toLowerCase()}: ${(lowerQuery.includes(songTitle.toLowerCase()))}`);
       if (lowerQuery.includes(songTitle.toLowerCase())) {
-        selectedSong = songs[0];
+        if ((explicit == 'true' && songs[0].badges != null) ||(explicit == 'false' && songs[0].badges == null)){
+          
+          selectedSong = songs[0];
+        
+        } else if (explicit == 'true' && songs[0].badges == null) {
+
+          const nextSongTitle = songs[1].title || '';
+          if (lowerQuery.includes(nextSongTitle.toLowerCase())){
+            if ( songs[1].badges[0] != null){
+              console.log("2nd song chosen")
+              selectedSong = songs[1];
+            }
+          }
+        }
+        
       }
 
       // just for testing purposes to see other results
