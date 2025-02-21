@@ -13,7 +13,7 @@ export default function RenderNew({ onTrackSelect, setAlbumImg }) {
   useEffect(() => {
     const fetchNew = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/new_releases`, { method: 'GET' });
+        const response = await fetch(`https://musicwebapp-bg57.onrender.com/api/new_releases`, { method: 'GET' });
         const data = await response.json();
         if (!response.ok) {
           throw new Error('Failed to fetch new releases');
