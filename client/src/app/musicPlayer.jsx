@@ -39,12 +39,12 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
       }
 
       try {
-        const videoRes = await axios.get(`https://musicwebapp-bg57.onrender.com/api/youtube/search`, {
+        const videoRes = await axios.get(`https://musicwebapp-ehib.onrender.com/api/youtube/search`, {
           params: { query: `${currentTrack.name} ${currentTrack.artists.map(a => a.name).join(' ')} ${currentTrack.explicit||false}` }
         });
         
         
-        const audioRes = await axios.get(`https://musicwebapp-bg57.onrender.com/api/audio/audio`, { 
+        const audioRes = await axios.get(`https://musicwebapp-ehib.onrender.com/api/audio/audio`, { 
           params: { videoId: videoRes.data.songId } 
         });
 
@@ -80,11 +80,11 @@ export default function MusicPlayer({ currentTrack, currentAlbumImg, onNextTrack
 
     const preloadNext = async () => {
       try {
-        const videoRes = await axios.get(`http://localhost:5001/api/youtube/search`, {
+        const videoRes = await axios.get(`https://musicwebapp-ehib.onrender.com/youtube/search`, {
           params: { query: `${nextTrack.name} ${nextTrack.artists.map(a => a.name).join(' ')} ${nextTrack.explicit||false}` }
         });
 
-        const audioRes = await axios.get(`http://localhost:5001/api/audio/audio`, { 
+        const audioRes = await axios.get(`https://musicwebapp-ehib.onrender.com/audio/audio`, { 
           params: { videoId: videoRes.data.songId } 
         });
 
