@@ -18,7 +18,7 @@ function NavBar({ onSearch, resetToPopular  }) {
         if (!searchTerm) return;
 
         try {
-            const response = await fetch(`https://musicwebapp-ehib.onrender.com/api/search?query=${encodeURIComponent(searchTerm)}`, {
+            const response = await fetch(`http://localhost:5001/api/search?query=${encodeURIComponent(searchTerm)}`, {
                 method: 'GET',
             });
     

@@ -9,7 +9,7 @@ export default function ShowTracks({ selectedAlbum, onBack, onTrackSelect, setAl
       try {
         setLoadingTracks(true);
         const response = await fetch(
-          `https://musicwebapp-ehib.onrender.com/api/songs?query=${encodeURIComponent(albumId)}`,
+          `http://localhost:5001/api/songs?query=${encodeURIComponent(albumId)}`,
           { method: 'GET' }
         );
         const data = await response.json();
